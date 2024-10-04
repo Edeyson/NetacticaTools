@@ -18,6 +18,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
+            max-width: 1000px;
         }
 
         h2 {
@@ -94,11 +95,11 @@
 
 <body>
     <div class="container">
-        <h2 class="text-center">Custom Bootstrap Collapse Generator with CKEditor</h2>
+        <h2 class="text-center">Generador de Collapse personalizado</h2>
 
         <!-- Accordion Name Input -->
         <div class="form-section">
-            <label for="accordionName" class="accordion-input">Accordion Name:</label>
+            <label for="accordionName" class="accordion-input">id del accordion: (sin espacios)</label>
             <input type="text" id="accordionName" class="form-control" placeholder="Enter accordion name" value="accordionExample">
         </div>
 
@@ -106,16 +107,16 @@
         <div id="entriesContainer"></div>
 
         <!-- Button to add new entry -->
-        <button id="addEntry" class="btn btn-success">Add New Entry</button>
+        <button id="addEntry" class="btn btn-success">Agregar Entrada</button>
 
         <!-- Button to generate the HTML -->
-        <button id="generateHTML" class="btn btn-primary">Generate HTML for All Entries</button>
+        <button id="generateHTML" class="btn btn-primary">Generar HTML</button>
 
         <!-- HTML Output -->
         <div class="result-container">
-            <h5>Generated HTML</h5>
+            <h5>HTML generado</h5>
             <div id="htmlOutput" class="code-output"></div>
-            <button id="copyToClipboard" class="btn btn-secondary copy-button">Copy to Clipboard</button>
+            <button id="copyToClipboard" class="btn btn-secondary copy-button">copiar al portapapeles</button>
         </div>
     </div>
 
@@ -136,13 +137,13 @@
             // Create a new entry container
             var entryHtml = `
             <div class="card-entry" id="entry${entryCount}">
-                <h4>Entry ${entryCount}</h4>
+                <h4>Entrada ${entryCount}</h4>
                 <div class="form-group">
-                    <label for="titleInput${entryCount}">Title</label>
+                    <label for="titleInput${entryCount}">Titulo</label>
                     <input type="text" class="form-control" id="titleInput${entryCount}" placeholder="Enter collapse title">
                 </div>
                 <div class="form-group editor-container">
-                    <label for="descriptionEditor${entryCount}">Description</label>
+                    <label for="descriptionEditor${entryCount}">Descripción</label>
                     <textarea id="editor${entryCount}" class="ckeditor"></textarea>
                 </div>
                 <hr>
