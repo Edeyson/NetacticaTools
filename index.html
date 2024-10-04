@@ -90,6 +90,11 @@
             font-size: 16px;
             color: #007bff;
         }
+        .flexTitle{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -137,7 +142,10 @@
             // Create a new entry container
             var entryHtml = `
             <div class="card-entry" id="entry${entryCount}">
-                <h4>Entrada ${entryCount}</h4>
+                <div class="flexTitle">
+                    <h4>Entrada ${entryCount}</h4>
+                    <button class="btn btn-danger remove-entry" data-entry-id="entry${entryCount}">Eliminar Entrada</button>
+                </div>
                 <div class="form-group">
                     <label for="titleInput${entryCount}">Titulo</label>
                     <input type="text" class="form-control" id="titleInput${entryCount}" placeholder="Enter collapse title">
@@ -155,6 +163,9 @@
 
             // Initialize CKEditor for the new textarea
             CKEDITOR.replace(`editor${entryCount}`);
+
+            // Attach remove event
+            attachRemoveEvent(`entry${entryCount}`);
         }
 
         // Add initial entry on page load
@@ -165,35 +176,44 @@
             addEntry();
         });
 
+        // Function to attach remove event
+        function attachRemoveEvent(entryId) {
+            $(`#${entryId} .remove-entry`).on('click', function () {
+                $(`#${entryId}`).remove();
+            });
+        }
+
         // Generate HTML for all entries
         $('#generateHTML').on('click', function () {
             var accordionName = $('#accordionName').val(); // Get the accordion name
             var allEntriesHTML = `<div id="${accordionName}">\n`;
 
             for (var i = 1; i <= entryCount; i++) {
-                var title = $(`#titleInput${i}`).val();
-                var description = CKEDITOR.instances[`editor${i}`].getData(); // Get HTML content from CKEditor
+                if ($(`#entry${i}`).length) {  // Check if entry exists (since it can be deleted)
+                    var title = $(`#titleInput${i}`).val();
+                    var description = CKEDITOR.instances[`editor${i}`].getData(); // Get HTML content from CKEditor
 
-                // Create Bootstrap collapse structure
-                var collapseId = 'collapse'+accordionName + Math.floor(Math.random() * 1000); // Unique ID for collapse
+                    // Create Bootstrap collapse structure
+                    var collapseId = 'collapse'+accordionName + Math.floor(Math.random() * 1000); // Unique ID for collapse
 
-                var entryHTML = `
-    <div class="card">
-        <div class="card-header" id="heading${collapseId}">
-            <h2>
-                <button class="btn botonAcordeon btn-block text-left collapsed" type="button" data-toggle="collapse"
-                        data-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
-                    ${title}
-                </button>
-            </h2>
-        </div>
-        <div class="collapse" id="${collapseId}" style="height:0px">
-            <div class="card-body">
-                <p>${description}</p>
+                    var entryHTML = `
+        <div class="card">
+            <div class="card-header" id="heading${collapseId}">
+                <h2>
+                    <button class="btn botonAcordeon btn-block text-left collapsed" type="button" data-toggle="collapse"
+                            data-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+                        ${title}
+                    </button>
+                </h2>
             </div>
-        </div>
-    </div>`;
-                allEntriesHTML += entryHTML + '\n\n';
+            <div class="collapse" id="${collapseId}" style="height:0px">
+                <div class="card-body">
+                    <p>${description}</p>
+                </div>
+            </div>
+        </div>`;
+                    allEntriesHTML += entryHTML + '\n\n';
+                }
             }
 
             allEntriesHTML += `</div>`; // Close the accordion container
