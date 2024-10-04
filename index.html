@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Bootstrap Collapse Generator with CKEditor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/css/bootstrap.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        body {
+            font-family: "Montserrat", sans-serif;
+            background-color: #f7f7f7;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .editor-container {
+            margin-bottom: 20px;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .code-output {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .card-entry {
+            margin-bottom: 20px;
+        }
+
+        .card-entry input{
+            width: 300px;
+            height: 24px;
+         
+        }
+
+        .btn {
+            margin-right: 5px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background-color: #565656;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .accordion-input {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .copy-button {
+            margin-top: 10px;
+        }
+
+        hr {
+            border-top: 1px solid #ccc;
+        }
+        
+        .botonAcordeon {
+            font-size: 16px;
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="text-center">Custom Bootstrap Collapse Generator with CKEditor</h2>
+
+        <!-- Accordion Name Input -->
+        <div class="form-section">
+            <label for="accordionName" class="accordion-input">Accordion Name:</label>
+            <input type="text" id="accordionName" class="form-control" placeholder="Enter accordion name" value="accordionExample">
+        </div>
+
+        <!-- Dynamic Entries Section -->
+        <div id="entriesContainer"></div>
+
+        <!-- Button to add new entry -->
+        <button id="addEntry" class="btn btn-success">Add New Entry</button>
+
+        <!-- Button to generate the HTML -->
+        <button id="generateHTML" class="btn btn-primary">Generate HTML for All Entries</button>
+
+        <!-- HTML Output -->
+        <div class="result-container">
+            <h5>Generated HTML</h5>
+            <div id="htmlOutput" class="code-output"></div>
+            <button id="copyToClipboard" class="btn btn-secondary copy-button">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <!-- CKEditor 4 -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        var entryCount = 0; // Counter to track entries
+
+        // Function to add a new entry section
+        function addEntry() {
+            entryCount++;
+
+            // Create a new entry container
+            var entryHtml = `
+            <div class="card-entry" id="entry${entryCount}">
+                <h4>Entry ${entryCount}</h4>
+                <div class="form-group">
+                    <label for="titleInput${entryCount}">Title</label>
+                    <input type="text" class="form-control" id="titleInput${entryCount}" placeholder="Enter collapse title">
+                </div>
+                <div class="form-group editor-container">
+                    <label for="descriptionEditor${entryCount}">Description</label>
+                    <textarea id="editor${entryCount}" class="ckeditor"></textarea>
+                </div>
+                <hr>
+            </div>
+            `;
+
+            // Append the new entry to the container
+            $('#entriesContainer').append(entryHtml);
+
+            // Initialize CKEditor for the new textarea
+            CKEDITOR.replace(`editor${entryCount}`);
+        }
+
+        // Add initial entry on page load
+        addEntry();
+
+        // Event listener for adding new entries
+        $('#addEntry').on('click', function () {
+            addEntry();
+        });
+
+        // Generate HTML for all entries
+        $('#generateHTML').on('click', function () {
+            var accordionName = $('#accordionName').val(); // Get the accordion name
+            var allEntriesHTML = `<div id="${accordionName}">\n`;
+
+            for (var i = 1; i <= entryCount; i++) {
+                var title = $(`#titleInput${i}`).val();
+                var description = CKEDITOR.instances[`editor${i}`].getData(); // Get HTML content from CKEditor
+
+                // Create Bootstrap collapse structure
+                var collapseId = 'collapse'+accordionName + Math.floor(Math.random() * 1000); // Unique ID for collapse
+
+                var entryHTML = `
+    <div class="card">
+        <div class="card-header" id="heading${collapseId}">
+            <h2>
+                <button class="btn botonAcordeon btn-block text-left collapsed" type="button" data-toggle="collapse"
+                        data-target="#${collapseId}" aria-expanded="false" aria-controls="${collapseId}">
+                    ${title}
+                </button>
+            </h2>
+        </div>
+        <div class="collapse" id="${collapseId}" style="height:0px">
+            <div class="card-body">
+                <p>${description}</p>
+            </div>
+        </div>
+    </div>`;
+                allEntriesHTML += entryHTML + '\n\n';
+            }
+
+            allEntriesHTML += `</div>`; // Close the accordion container
+
+            // Display the generated HTML
+            $('#htmlOutput').text(allEntriesHTML);
+        });
+
+        // Copy the generated HTML to clipboard
+        $('#copyToClipboard').on('click', function () {
+            var copyText = $('#htmlOutput').text();
+
+            // Create a temporary element to copy text
+            var tempElement = document.createElement('textarea');
+            tempElement.value = copyText;
+            document.body.appendChild(tempElement);
+            tempElement.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempElement);
+
+            alert('HTML copied to clipboard!');
+        });
+    </script>
+</body>
+
+</html>
