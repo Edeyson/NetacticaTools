@@ -6,12 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Collapse personalizado</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
         body {
             font-family: "Montserrat", sans-serif;
             background-color: #f7f7f7;
         }
+
         .container {
             background-color: #ffffff;
             padding: 20px;
@@ -51,12 +54,11 @@
 
         .card-entry {
             margin-bottom: 20px;
-        }
-
-        .card-entry input{
-            width: 300px;
-            height: 24px;
-         
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: move;
+            /* Indica que es arrastrable */
         }
 
         .btn {
@@ -85,15 +87,14 @@
         hr {
             border-top: 1px solid #ccc;
         }
-        
+
         .botonAcordeon {
             font-size: 16px;
             color: #007bff;
         }
-        .flexTitle{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+
+        .cke_notifications_area {
+            display: none;
         }
     </style>
 </head>
@@ -105,11 +106,12 @@
         <!-- Accordion Name Input -->
         <div class="form-section">
             <label for="accordionName" class="accordion-input">id del accordion: (sin espacios)</label>
-            <input type="text" id="accordionName" class="form-control" placeholder="Enter accordion name" value="accordionExample">
+            <input type="text" id="accordionName" class="form-control" placeholder="Enter accordion name"
+                value="accordionExample">
         </div>
 
         <!-- Dynamic Entries Section -->
-        <div id="entriesContainer"></div>
+        <div id="entriesContainer" class="sortable"></div>
 
         <!-- Button to add new entry -->
         <button id="addEntry" class="btn btn-success">Agregar Entrada</button>
@@ -128,8 +130,9 @@
     <!-- CKEditor 4 -->
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
-    <!-- Bootstrap & jQuery -->
+    <!-- jQuery, jQuery UI, and Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -142,10 +145,7 @@
             // Create a new entry container
             var entryHtml = `
             <div class="card-entry" id="entry${entryCount}">
-                <div class="flexTitle">
-                    <h4>Entrada ${entryCount}</h4>
-                    <button class="btn btn-danger remove-entry" data-entry-id="entry${entryCount}">Eliminar Entrada</button>
-                </div>
+                <h4>Entrada ${entryCount}</h4>
                 <div class="form-group">
                     <label for="titleInput${entryCount}">Titulo</label>
                     <input type="text" class="form-control" id="titleInput${entryCount}" placeholder="Enter collapse title">
@@ -154,6 +154,7 @@
                     <label for="descriptionEditor${entryCount}">Descripción</label>
                     <textarea id="editor${entryCount}" class="ckeditor"></textarea>
                 </div>
+                <button class="btn btn-danger remove-entry" data-entry-id="entry${entryCount}">Eliminar Entrada</button>
                 <hr>
             </div>
             `;
@@ -188,15 +189,16 @@
             var accordionName = $('#accordionName').val(); // Get the accordion name
             var allEntriesHTML = `<div id="${accordionName}">\n`;
 
-            for (var i = 1; i <= entryCount; i++) {
-                if ($(`#entry${i}`).length) {  // Check if entry exists (since it can be deleted)
-                    var title = $(`#titleInput${i}`).val();
-                    var description = CKEDITOR.instances[`editor${i}`].getData(); // Get HTML content from CKEditor
+            $('#entriesContainer .card-entry').each(function () {
+                var entryId = $(this).attr('id');
+                var entryIndex = entryId.replace('entry', '');
+                var title = $(`#titleInput${entryIndex}`).val();
+                var description = CKEDITOR.instances[`editor${entryIndex}`].getData(); // Get HTML content from CKEditor
 
-                    // Create Bootstrap collapse structure
-                    var collapseId = 'collapse'+accordionName + Math.floor(Math.random() * 1000); // Unique ID for collapse
+                // Create Bootstrap collapse structure
+                var collapseId = 'collapse' + accordionName + Math.floor(Math.random() * 1000); // Unique ID for collapse
 
-                    var entryHTML = `
+                var entryHTML = `
         <div class="card">
             <div class="card-header" id="heading${collapseId}">
                 <h2>
@@ -212,9 +214,8 @@
                 </div>
             </div>
         </div>`;
-                    allEntriesHTML += entryHTML + '\n\n';
-                }
-            }
+                allEntriesHTML += entryHTML + '\n\n';
+            });
 
             allEntriesHTML += `</div>`; // Close the accordion container
 
@@ -235,6 +236,11 @@
             document.body.removeChild(tempElement);
 
             alert('HTML copied to clipboard!');
+        });
+
+        // Make entries sortable (draggable)
+        $(function () {
+            $("#entriesContainer").sortable();
         });
     </script>
 </body>
