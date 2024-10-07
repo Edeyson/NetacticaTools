@@ -22,6 +22,8 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
             max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         h2 {
@@ -60,6 +62,16 @@
             cursor: move;
             /* Indica que es arrastrable */
         }
+        .card-entry h4{
+            margin: 0px 0 1rem;
+        }
+        .card-entry .form-group{
+            margin-bottom: 8px;
+        }
+        .card-entry input{
+            width: 400px;
+            height: 28px;
+        }
 
         .btn {
             margin-right: 5px;
@@ -95,6 +107,10 @@
 
         .cke_notifications_area {
             display: none;
+        }
+        .flex-title{
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
@@ -145,7 +161,10 @@
             // Create a new entry container
             var entryHtml = `
             <div class="card-entry" id="entry${entryCount}">
-                <h4>Entrada ${entryCount}</h4>
+                <div class="flex-title">
+                    <h4>Entrada ${entryCount}</h4>
+                    <button class="btn btn-danger remove-entry" data-entry-id="entry${entryCount}">Eliminar Entrada</button>
+                </div>
                 <div class="form-group">
                     <label for="titleInput${entryCount}">Titulo</label>
                     <input type="text" class="form-control" id="titleInput${entryCount}" placeholder="Enter collapse title">
@@ -154,8 +173,7 @@
                     <label for="descriptionEditor${entryCount}">Descripción</label>
                     <textarea id="editor${entryCount}" class="ckeditor"></textarea>
                 </div>
-                <button class="btn btn-danger remove-entry" data-entry-id="entry${entryCount}">Eliminar Entrada</button>
-                <hr>
+                
             </div>
             `;
 
